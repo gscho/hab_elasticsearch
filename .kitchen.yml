@@ -1,6 +1,4 @@
 ---
-driver:
-  name: vagrant
 
 provisioner:
   name: chef_zero
@@ -16,10 +14,38 @@ platforms:
   - name: centos-7.2
 
 suites:
-  - name: default
+  - name: default_1
     run_list:
       - recipe[hab_elasticsearch::default]
     verifier:
       inspec_tests:
         - test/smoke/default
+    driver:
+      name: vagrant
+      network:
+        - ['forwarded_port', {guest: 9200, host: 9200, id: 'es-node-1', auto_correct: false}]
+        - ["private_network", {ip: "192.168.33.33"}]
+
     attributes:
+  - name: default_2
+    run_list:
+      - recipe[hab_elasticsearch::default]
+    verifier:
+      inspec_tests:
+        - test/smoke/default
+    driver:
+      name: vagrant
+      network:
+        - ['forwarded_port', {guest: 9200, host: 9201, id: 'es-node-2', auto_correct: false}]
+        - ["private_network", {ip: "192.168.33.34"}]
+  - name: default_3
+    run_list:
+      - recipe[hab_elasticsearch::default]
+    verifier:
+      inspec_tests:
+        - test/smoke/default
+    driver:
+      name: vagrant
+      network:
+        - ['forwarded_port', {guest: 9200, host: 9202, id: 'es-node-3', auto_correct: false}]
+        - ["private_network", {ip: "192.168.33.35"}]
