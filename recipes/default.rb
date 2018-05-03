@@ -3,27 +3,24 @@
 # Recipe:: default
 #
 # Copyright:: 2018, The Authors, All Rights Reserved.
-hab_install
+include_recipe 'hab_elasticsearch::_install_hab'
 
-hab_sup 'default' do
-  hab_channel 'stable'
-end
-
-hab_package 'core/elasticsearch'
-
-hab_service 'core/elasticsearch' do
-  strategy 'rolling'
-  channel :stable
+# Loads and starts the elasticsearch habitat package
+hab_service 'gscho/elasticsearch' do
   action [:load, :start]
+  topology 'leader'
+  strategy 'rolling'
+  service_group 'cluster'
 end
 
-hab_config 'elasticsearch.default' do
+# Applies the port configuration to the cluster
+hab_config 'elasticsearch.cluster' do
   config({
-    cluster: {
-      name: 'foobar',
-    },
     network: {
-      host: '_local_',
+      host: node['ipaddress'],
+    },
+    http: {
+      port: node['es']['port'],
     },
   })
 end
